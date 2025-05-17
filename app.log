@@ -1,0 +1,94 @@
+2025-05-17 07:57:06,391 - INFO - Loaded configuration from model_config_v1.json
+2025-05-17 07:57:06,422 - ERROR - Model file best_model_v1.pt not found
+2025-05-17 07:57:06,422 - ERROR - Scaler file scaler_v1.gz not found
+2025-05-17 07:57:06,423 - ERROR - Label encoder file label_encoder_v1.gz not found
+2025-05-17 07:57:06,427 - ERROR - Input validation failed: Missing or NaN value for Methane
+2025-05-17 07:57:06,427 - ERROR - Input validation failed: Health index value 150.0 outside range [0, 100]
+2025-05-17 07:57:06,427 - WARNING - Label encoder not loaded, using numerical labels
+2025-05-17 07:57:06,461 - WARNING - Scaler not loaded, using unscaled data
+2025-05-17 07:57:06,461 - ERROR - Prediction error: 'CH4_pct'
+Traceback (most recent call last):
+  File "C:\Users\allio\OneDrive\Desktop\foden project\.conda\Lib\site-packages\pandas\core\indexes\base.py", line 3805, in get_loc
+    return self._engine.get_loc(casted_key)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "index.pyx", line 167, in pandas._libs.index.IndexEngine.get_loc
+  File "index.pyx", line 196, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas\\_libs\\hashtable_class_helper.pxi", line 7081, in pandas._libs.hashtable.PyObjectHashTable.get_item
+  File "pandas\\_libs\\hashtable_class_helper.pxi", line 7089, in pandas._libs.hashtable.PyObjectHashTable.get_item
+KeyError: 'CH4_pct'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "c:\Users\allio\OneDrive\Desktop\foden project\model_pipeline.py", line 254, in predict_fault
+    df_scaled, health_index, ch4_pct, c2h4_pct, c2h2_pct = preprocess_input(
+                                                           ^^^^^^^^^^^^^^^^^
+  File "c:\Users\allio\OneDrive\Desktop\foden project\model_pipeline.py", line 230, in preprocess_input
+    df_input['CH4_pct'].iloc[0],
+    ~~~~~~~~^^^^^^^^^^^
+  File "C:\Users\allio\OneDrive\Desktop\foden project\.conda\Lib\site-packages\pandas\core\frame.py", line 4102, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\allio\OneDrive\Desktop\foden project\.conda\Lib\site-packages\pandas\core\indexes\base.py", line 3812, in get_loc
+    raise KeyError(key) from err
+KeyError: 'CH4_pct'
+2025-05-17 07:57:06,471 - WARNING - Label encoder not loaded, using numerical labels
+2025-05-17 07:57:06,475 - WARNING - Scaler not loaded, using unscaled data
+2025-05-17 07:57:06,475 - ERROR - Prediction error: 'CH4_pct'
+Traceback (most recent call last):
+  File "C:\Users\allio\OneDrive\Desktop\foden project\.conda\Lib\site-packages\pandas\core\indexes\base.py", line 3805, in get_loc
+    return self._engine.get_loc(casted_key)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "index.pyx", line 167, in pandas._libs.index.IndexEngine.get_loc
+  File "index.pyx", line 196, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas\\_libs\\hashtable_class_helper.pxi", line 7081, in pandas._libs.hashtable.PyObjectHashTable.get_item
+  File "pandas\\_libs\\hashtable_class_helper.pxi", line 7089, in pandas._libs.hashtable.PyObjectHashTable.get_item
+KeyError: 'CH4_pct'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "c:\Users\allio\OneDrive\Desktop\foden project\model_pipeline.py", line 254, in predict_fault
+    df_scaled, health_index, ch4_pct, c2h4_pct, c2h2_pct = preprocess_input(
+                                                           ^^^^^^^^^^^^^^^^^
+  File "c:\Users\allio\OneDrive\Desktop\foden project\model_pipeline.py", line 230, in preprocess_input
+    df_input['CH4_pct'].iloc[0],
+    ~~~~~~~~^^^^^^^^^^^
+  File "C:\Users\allio\OneDrive\Desktop\foden project\.conda\Lib\site-packages\pandas\core\frame.py", line 4102, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\allio\OneDrive\Desktop\foden project\.conda\Lib\site-packages\pandas\core\indexes\base.py", line 3812, in get_loc
+    raise KeyError(key) from err
+KeyError: 'CH4_pct'
+2025-05-17 07:57:06,477 - WARNING - Label encoder not loaded, using numerical labels
+2025-05-17 07:57:06,483 - WARNING - Scaler not loaded, using unscaled data
+2025-05-17 07:57:06,483 - ERROR - Prediction error: 'CH4_pct'
+Traceback (most recent call last):
+  File "C:\Users\allio\OneDrive\Desktop\foden project\.conda\Lib\site-packages\pandas\core\indexes\base.py", line 3805, in get_loc
+    return self._engine.get_loc(casted_key)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "index.pyx", line 167, in pandas._libs.index.IndexEngine.get_loc
+  File "index.pyx", line 196, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas\\_libs\\hashtable_class_helper.pxi", line 7081, in pandas._libs.hashtable.PyObjectHashTable.get_item
+  File "pandas\\_libs\\hashtable_class_helper.pxi", line 7089, in pandas._libs.hashtable.PyObjectHashTable.get_item
+KeyError: 'CH4_pct'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "c:\Users\allio\OneDrive\Desktop\foden project\model_pipeline.py", line 254, in predict_fault
+    df_scaled, health_index, ch4_pct, c2h4_pct, c2h2_pct = preprocess_input(
+                                                           ^^^^^^^^^^^^^^^^^
+  File "c:\Users\allio\OneDrive\Desktop\foden project\model_pipeline.py", line 230, in preprocess_input
+    df_input['CH4_pct'].iloc[0],
+    ~~~~~~~~^^^^^^^^^^^
+  File "C:\Users\allio\OneDrive\Desktop\foden project\.conda\Lib\site-packages\pandas\core\frame.py", line 4102, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\allio\OneDrive\Desktop\foden project\.conda\Lib\site-packages\pandas\core\indexes\base.py", line 3812, in get_loc
+    raise KeyError(key) from err
+KeyError: 'CH4_pct'
+2025-05-17 07:57:21,324 - INFO - Loaded configuration from model_config_v1.json
+2025-05-17 07:57:21,329 - ERROR - Model file best_model_v1.pt not found
+2025-05-17 07:57:21,329 - ERROR - Scaler file scaler_v1.gz not found
+2025-05-17 07:57:21,329 - ERROR - Label encoder file label_encoder_v1.gz not found

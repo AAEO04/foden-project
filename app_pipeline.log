@@ -1,0 +1,5 @@
+2025-05-17 20:38:24,477 - INFO - Pipeline using device: cpu
+2025-05-17 20:38:24,478 - INFO - Loaded configuration from model_config_v1.json
+2025-05-17 20:38:24,510 - ERROR - Model file best_fault_analysis_model.pt not found
+2025-05-17 20:38:24,510 - ERROR - Scaler file final_model_scaler.gz not found
+2025-05-17 20:38:24,510 - ERROR - Label encoder file label_encoder_final.gz not found

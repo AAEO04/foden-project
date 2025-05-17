@@ -1,0 +1,24 @@
+{
+  "version": "1.0",
+  "model": {
+    "input_size": 19,
+    "hidden1_units": 128,
+    "hidden2_units": 64,
+    "num_classes": 5, 
+    "dropout_rate": 0.3
+  },
+  "features": {
+    "base_input_features": [ 
+      "Hydrogen", "Oxigen", "Nitrogen", "Methane", "CO", "CO2", 
+      "Ethylene", "Ethane", "Acethylene", "DBDS", "Power factor", 
+      "Interfacial V", "Dielectric rigidity", "Water content", 
+      "Health index", "Life expectation"
+    ],
+    "model_features_order": [
+      "Hydrogen", "Oxigen", "Nitrogen", "Methane", "CO", "CO2", "Ethylene", 
+      "Ethane", "Acethylene", "DBDS", "Power factor", "Interfacial V", 
+      "Dielectric rigidity", "Water content", "Life expectation", 
+      "CH4_H2", "C2H6_CH4", "C2H4_C2H6", "C2H2_C2H4"
+    ]
+  }
+}
