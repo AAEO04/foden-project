@@ -1,173 +1,36 @@
-2025-06-03 12:03:46,490 - INFO - Training started on 2025-06-03 12:03:46.484407
-2025-06-03 12:03:46,519 - INFO - Loaded Health_index1.csv. Shape: (470, 16)
-2025-06-03 12:03:46,699 - INFO - Saved scaler.
-2025-06-03 12:03:46,704 - INFO - Training set sizes: Health: (376, 61), Life: (376, 61)
-2025-06-03 12:03:53,402 - INFO - Selected 12 features with importance > 0.015
-2025-06-03 12:03:53,402 - INFO - Feature: Methane, Importance: 0.0448
-2025-06-03 12:03:53,402 - INFO - Feature: Acetylene, Importance: 0.0996
-2025-06-03 12:03:53,402 - INFO - Feature: DBDS, Importance: 0.0625
-2025-06-03 12:03:53,402 - INFO - Feature: C2H2_C2H4_ratio, Importance: 0.0547
-2025-06-03 12:03:53,402 - INFO - Feature: C2H2_CH4_ratio, Importance: 0.0254
-2025-06-03 12:03:53,404 - INFO - Feature: Gas_DBDS_interaction, Importance: 0.0852
-2025-06-03 12:03:53,404 - INFO - Feature: H2_level_VH, Importance: 0.0322
-2025-06-03 12:03:53,404 - INFO - Feature: Poly_1, Importance: 0.1320
-2025-06-03 12:03:53,404 - INFO - Feature: Poly_6, Importance: 0.0857
-2025-06-03 12:03:53,404 - INFO - Feature: Poly_9, Importance: 0.0376
-2025-06-03 12:03:53,404 - INFO - Feature: Poly_11, Importance: 0.0246
-2025-06-03 12:03:53,404 - INFO - Feature: Poly_19, Importance: 0.0162
-2025-06-03 12:04:25,632 - INFO - 
+2025-06-03 15:20:14,891 - INFO - Training started on 2025-06-03 15:20:14.888267
+2025-06-03 15:20:14,910 - INFO - Loaded Health_index1.csv. Shape: (470, 16)
+2025-06-03 15:20:15,029 - INFO - Saved scaler.
+2025-06-03 15:20:15,033 - INFO - Training set sizes: Health: (376, 61), Life: (376, 61)
+2025-06-03 15:20:15,350 - INFO - Selected features with importance > 0.02
+2025-06-03 15:20:15,351 - INFO - Feature: Methane, Importance: 0.0840
+2025-06-03 15:20:15,351 - INFO - Feature: Acetylene, Importance: 0.0318
+2025-06-03 15:20:15,351 - INFO - Feature: DBDS, Importance: 0.0501
+2025-06-03 15:20:15,352 - INFO - Feature: Interfacial V, Importance: 0.0254
+2025-06-03 15:20:15,352 - INFO - Feature: C2H2_C2H4_ratio, Importance: 0.0317
+2025-06-03 15:20:15,352 - INFO - Feature: C2H2_CH4_ratio, Importance: 0.0233
+2025-06-03 15:20:15,352 - INFO - Feature: Gas_DBDS_interaction, Importance: 0.0837
+2025-06-03 15:20:15,352 - INFO - Feature: Poly_1, Importance: 0.1383
+2025-06-03 15:20:15,352 - INFO - Feature: Poly_6, Importance: 0.0616
+2025-06-03 15:20:15,352 - INFO - Feature: Poly_7, Importance: 0.0249
+2025-06-03 15:20:15,352 - INFO - Feature: Poly_9, Importance: 0.0386
+2025-06-03 15:20:15,353 - INFO - Feature: Poly_11, Importance: 0.0339
+2025-06-03 15:20:17,668 - INFO - 
 Health Index Performance Metrics:
-2025-06-03 12:04:25,633 - INFO - MSE (Test): 89.9787
-2025-06-03 12:04:25,633 - INFO - RMSE (Test): 9.4857
-2025-06-03 12:04:25,633 - INFO - MAE (Test): 6.3040
-2025-06-03 12:04:25,633 - INFO - R² Score: 0.7373
-2025-06-03 12:04:25,633 - INFO - CV MSE: 105.3414 ± 20.4496
-2025-06-03 12:04:33,936 - INFO - 
+2025-06-03 15:20:17,669 - INFO - MSE (Test): 93.5389
+2025-06-03 15:20:17,669 - INFO - RMSE (Test): 9.6715
+2025-06-03 15:20:17,669 - INFO - MAE (Test): 7.4153
+2025-06-03 15:20:17,669 - INFO - R² Score: 0.7269
+2025-06-03 15:20:17,669 - INFO - CV MSE: 98.6424 ± 12.3394
+2025-06-03 15:20:18,380 - INFO - 
 Life Expectation Performance Metrics:
-2025-06-03 12:04:33,937 - INFO - MSE (Test): 147.8630
-2025-06-03 12:04:33,937 - INFO - RMSE (Test): 12.1599
-2025-06-03 12:04:33,937 - INFO - MAE (Test): 8.6793
-2025-06-03 12:04:33,937 - INFO - R² Score: 0.4798
-2025-06-03 12:04:33,937 - INFO - CV MSE: 166.0095 ± 20.0956
-2025-06-03 12:04:34,634 - INFO - Saved Health_index feature importance plot.
-2025-06-03 12:04:35,004 - INFO - Saved Life_expectation feature importance plot.
-2025-06-03 12:04:35,021 - INFO - Training completed. Summary:
-2025-06-03 12:14:39,580 - INFO - Training started on 2025-06-03 12:14:39.572452
-2025-06-03 12:14:39,784 - INFO - Loaded Health_index1.csv. Shape: (470, 16)
-2025-06-03 12:14:40,237 - INFO - Saved scaler.
-2025-06-03 12:14:40,260 - INFO - Training set sizes: Health: (376, 61), Life: (376, 61)
-2025-06-03 12:14:43,389 - INFO - Selected features with importance > 0.02
-2025-06-03 12:14:43,389 - INFO - Feature: Methane, Importance: 0.0679
-2025-06-03 12:14:43,390 - INFO - Feature: Acetylene, Importance: 0.0661
-2025-06-03 12:14:43,390 - INFO - Feature: DBDS, Importance: 0.0583
-2025-06-03 12:14:43,390 - INFO - Feature: C2H2_C2H4_ratio, Importance: 0.0375
-2025-06-03 12:14:43,390 - INFO - Feature: C2H2_CH4_ratio, Importance: 0.0244
-2025-06-03 12:14:43,390 - INFO - Feature: Gas_DBDS_interaction, Importance: 0.0816
-2025-06-03 12:14:43,390 - INFO - Feature: Poly_1, Importance: 0.1267
-2025-06-03 12:14:43,390 - INFO - Feature: Poly_6, Importance: 0.0806
-2025-06-03 12:14:43,390 - INFO - Feature: Poly_9, Importance: 0.0299
-2025-06-03 12:14:43,390 - INFO - Feature: Poly_10, Importance: 0.0399
-2025-06-03 12:14:43,390 - INFO - Feature: Poly_11, Importance: 0.0220
-2025-06-03 12:15:05,345 - INFO - 
-Health Index Performance Metrics:
-2025-06-03 12:15:05,345 - INFO - MSE (Test): 80.0072
-2025-06-03 12:15:05,345 - INFO - RMSE (Test): 8.9447
-2025-06-03 12:15:05,345 - INFO - MAE (Test): 6.0883
-2025-06-03 12:15:05,345 - INFO - R² Score: 0.7664
-2025-06-03 12:15:05,347 - INFO - CV MSE: 99.0112 ± 20.9748
-2025-06-03 12:15:10,495 - INFO - 
-Life Expectation Performance Metrics:
-2025-06-03 12:15:10,496 - INFO - MSE (Test): 138.9297
-2025-06-03 12:15:10,496 - INFO - RMSE (Test): 11.7868
-2025-06-03 12:15:10,496 - INFO - MAE (Test): 8.6167
-2025-06-03 12:15:10,496 - INFO - R² Score: 0.5112
-2025-06-03 12:15:10,496 - INFO - CV MSE: 149.0263 ± 22.0523
-2025-06-03 12:15:11,090 - INFO - Saved Health_index feature importance plot.
-2025-06-03 12:15:11,368 - INFO - Saved Life_expectation feature importance plot.
-2025-06-03 12:15:11,389 - INFO - Training completed. Summary:
-2025-06-03 12:49:25,124 - INFO - Training completed. Summary:
-2025-06-03 12:49:25,128 - INFO - - Health Index MSE (Test): 80.0072, CV MSE: 99.0112 ± 20.9748 (Target: ≤50)
-2025-06-03 12:49:25,128 - INFO - - Life Expectation MSE (Test): 138.9297, CV MSE: 149.0263 ± 22.0523 (Target: ≤30)
-2025-06-03 12:51:12,304 - INFO - Training started on 2025-06-03 12:51:12.296221
-2025-06-03 12:51:12,442 - INFO - Loaded Health_index1.csv. Shape: (470, 16)
-2025-06-03 12:51:12,718 - INFO - Saved scaler.
-2025-06-03 12:51:12,734 - INFO - Training set sizes: Health: (376, 61), Life: (376, 61)
-2025-06-03 12:51:14,794 - INFO - Selected features with importance > 0.02
-2025-06-03 12:51:14,795 - INFO - Feature: Methane, Importance: 0.0714
-2025-06-03 12:51:14,795 - INFO - Feature: Acetylene, Importance: 0.0510
-2025-06-03 12:51:14,795 - INFO - Feature: DBDS, Importance: 0.0514
-2025-06-03 12:51:14,795 - INFO - Feature: C2H2_C2H4_ratio, Importance: 0.0316
-2025-06-03 12:51:14,795 - INFO - Feature: Gas_DBDS_interaction, Importance: 0.0792
-2025-06-03 12:51:14,795 - INFO - Feature: Poly_1, Importance: 0.1254
-2025-06-03 12:51:14,795 - INFO - Feature: Poly_6, Importance: 0.0760
-2025-06-03 12:51:14,795 - INFO - Feature: Poly_9, Importance: 0.0324
-2025-06-03 12:51:14,795 - INFO - Feature: Poly_10, Importance: 0.0392
-2025-06-03 12:51:14,795 - INFO - Feature: Poly_11, Importance: 0.0251
-2025-06-03 12:51:38,882 - INFO - 
-Health Index Performance Metrics:
-2025-06-03 12:51:38,882 - INFO - MSE (Test): 78.7531
-2025-06-03 12:51:38,882 - INFO - RMSE (Test): 8.8743
-2025-06-03 12:51:38,882 - INFO - MAE (Test): 5.9748
-2025-06-03 12:51:38,882 - INFO - R² Score: 0.7701
-2025-06-03 12:51:38,883 - INFO - CV MSE: 94.3647 ± 20.4603
-2025-06-03 12:51:49,188 - INFO - 
-Life Expectation Performance Metrics:
-2025-06-03 12:51:49,189 - INFO - MSE (Test): 134.9718
-2025-06-03 12:51:49,189 - INFO - RMSE (Test): 11.6177
-2025-06-03 12:51:49,189 - INFO - MAE (Test): 8.5634
-2025-06-03 12:51:49,189 - INFO - R² Score: 0.5251
-2025-06-03 12:51:49,190 - INFO - CV MSE: 145.8618 ± 21.1053
-2025-06-03 12:51:50,163 - INFO - Saved Health_index feature importance plot.
-2025-06-03 12:51:50,617 - INFO - Saved Life_expectation feature importance plot.
-2025-06-03 12:51:50,645 - INFO - Training completed. Summary:
-2025-06-03 12:51:50,647 - INFO - - Health Index MSE (Test): 78.7531, CV MSE: 94.3647 ± 20.4603 (Target: ≤50)
-2025-06-03 12:51:50,648 - INFO - - Life Expectation MSE (Test): 134.9718, CV MSE: 145.8618 ± 21.1053 (Target: ≤30)
-2025-06-03 12:55:32,629 - INFO - Training started on 2025-06-03 12:55:32.624967
-2025-06-03 12:55:32,737 - INFO - Loaded Health_index1.csv. Shape: (470, 16)
-2025-06-03 12:55:32,993 - INFO - Saved scaler.
-2025-06-03 12:55:33,008 - INFO - Training set sizes: Health: (376, 61), Life: (376, 61)
-2025-06-03 12:55:34,696 - INFO - Selected features with importance > 0.02
-2025-06-03 12:55:34,696 - INFO - Feature: Methane, Importance: 0.0603
-2025-06-03 12:55:34,697 - INFO - Feature: Acetylene, Importance: 0.0677
-2025-06-03 12:55:34,697 - INFO - Feature: DBDS, Importance: 0.0631
-2025-06-03 12:55:34,697 - INFO - Feature: C2H2_C2H4_ratio, Importance: 0.0474
-2025-06-03 12:55:34,697 - INFO - Feature: C2H2_CH4_ratio, Importance: 0.0219
-2025-06-03 12:55:34,697 - INFO - Feature: Gas_DBDS_interaction, Importance: 0.0809
-2025-06-03 12:55:34,697 - INFO - Feature: Poly_1, Importance: 0.1828
-2025-06-03 12:55:34,697 - INFO - Feature: Poly_6, Importance: 0.0792
-2025-06-03 12:55:34,697 - INFO - Feature: Poly_9, Importance: 0.0335
-2025-06-03 12:55:48,367 - INFO - 
-Health Index Performance Metrics:
-2025-06-03 12:55:48,367 - INFO - MSE (Test): 76.0195
-2025-06-03 12:55:48,367 - INFO - RMSE (Test): 8.7189
-2025-06-03 12:55:48,367 - INFO - MAE (Test): 5.9077
-2025-06-03 12:55:48,367 - INFO - R² Score: 0.7780
-2025-06-03 12:55:48,368 - INFO - CV MSE: 100.0799 ± 19.9669
-2025-06-03 12:55:51,814 - INFO - 
-Life Expectation Performance Metrics:
-2025-06-03 12:55:51,814 - INFO - MSE (Test): 147.2490
-2025-06-03 12:55:51,814 - INFO - RMSE (Test): 12.1346
-2025-06-03 12:55:51,814 - INFO - MAE (Test): 8.8269
-2025-06-03 12:55:51,815 - INFO - R² Score: 0.4819
-2025-06-03 12:55:51,816 - INFO - CV MSE: 154.3561 ± 21.8999
-2025-06-03 12:55:52,223 - INFO - Saved Health_index feature importance plot.
-2025-06-03 12:55:52,495 - INFO - Saved Life_expectation feature importance plot.
-2025-06-03 12:55:52,509 - INFO - Training completed. Summary:
-2025-06-03 12:55:52,509 - INFO - - Health Index MSE (Test): 76.0195, CV MSE: 100.0799 ± 19.9669 (Target: ≤50)
-2025-06-03 12:55:52,509 - INFO - - Life Expectation MSE (Test): 147.2490, CV MSE: 154.3561 ± 21.8999 (Target: ≤30)
-2025-06-03 13:17:21,891 - INFO - Training started on 2025-06-03 13:17:21.880187
-2025-06-03 13:17:22,012 - INFO - Loaded Health_index1.csv. Shape: (470, 16)
-2025-06-03 13:17:22,345 - INFO - Saved scaler.
-2025-06-03 13:17:22,364 - INFO - Training set sizes: Health: (376, 61), Life: (376, 61)
-2025-06-03 13:17:23,808 - INFO - Selected features with importance > 0.02
-2025-06-03 13:17:23,808 - INFO - Feature: Methane, Importance: 0.0840
-2025-06-03 13:17:23,808 - INFO - Feature: Acetylene, Importance: 0.0318
-2025-06-03 13:17:23,808 - INFO - Feature: DBDS, Importance: 0.0501
-2025-06-03 13:17:23,808 - INFO - Feature: Interfacial V, Importance: 0.0254
-2025-06-03 13:17:23,808 - INFO - Feature: C2H2_C2H4_ratio, Importance: 0.0317
-2025-06-03 13:17:23,808 - INFO - Feature: C2H2_CH4_ratio, Importance: 0.0233
-2025-06-03 13:17:23,808 - INFO - Feature: Gas_DBDS_interaction, Importance: 0.0837
-2025-06-03 13:17:23,808 - INFO - Feature: Poly_1, Importance: 0.1383
-2025-06-03 13:17:23,808 - INFO - Feature: Poly_6, Importance: 0.0616
-2025-06-03 13:17:23,808 - INFO - Feature: Poly_7, Importance: 0.0249
-2025-06-03 13:17:23,808 - INFO - Feature: Poly_9, Importance: 0.0386
-2025-06-03 13:17:23,808 - INFO - Feature: Poly_11, Importance: 0.0339
-2025-06-03 13:17:26,377 - INFO - 
-Health Index Performance Metrics:
-2025-06-03 13:17:26,377 - INFO - MSE (Test): 93.5389
-2025-06-03 13:17:26,377 - INFO - RMSE (Test): 9.6715
-2025-06-03 13:17:26,377 - INFO - MAE (Test): 7.4153
-2025-06-03 13:17:26,377 - INFO - R² Score: 0.7269
-2025-06-03 13:17:26,378 - INFO - CV MSE: 98.6424 ± 12.3394
-2025-06-03 13:17:27,206 - INFO - 
-Life Expectation Performance Metrics:
-2025-06-03 13:17:27,206 - INFO - MSE (Test): 88.2770
-2025-06-03 13:17:27,206 - INFO - RMSE (Test): 9.3956
-2025-06-03 13:17:27,206 - INFO - MAE (Test): 7.4120
-2025-06-03 13:17:27,206 - INFO - R² Score: 0.6894
-2025-06-03 13:17:27,206 - INFO - CV MSE: 130.6651 ± 10.6862
-2025-06-03 13:17:27,875 - INFO - Saved Health_index feature importance plot.
-2025-06-03 13:17:28,197 - INFO - Saved Life_expectation feature importance plot.
-2025-06-03 13:17:28,219 - INFO - Training completed. Summary:
-2025-06-03 13:17:28,220 - INFO - - Health Index MSE (Test): 93.5389, CV MSE: 98.6424 ± 12.3394 (Target: ≤50)
-2025-06-03 13:17:28,221 - INFO - - Life Expectation MSE (Test): 88.2770, CV MSE: 130.6651 ± 10.6862 (Target: ≤30)
+2025-06-03 15:20:18,382 - INFO - MSE (Test): 88.2770
+2025-06-03 15:20:18,383 - INFO - RMSE (Test): 9.3956
+2025-06-03 15:20:18,383 - INFO - MAE (Test): 7.4120
+2025-06-03 15:20:18,383 - INFO - R² Score: 0.6894
+2025-06-03 15:20:18,383 - INFO - CV MSE: 130.6651 ± 10.6862
+2025-06-03 15:20:18,896 - INFO - Saved Health_index feature importance plot.
+2025-06-03 15:20:19,289 - INFO - Saved Life_expectation feature importance plot.
+2025-06-03 15:20:19,327 - INFO - Training completed. Summary:
+2025-06-03 15:20:19,328 - INFO - - Health Index MSE (Test): 93.5389, CV MSE: 98.6424 ± 12.3394 (Target: ≤50)
+2025-06-03 15:20:19,328 - INFO - - Life Expectation MSE (Test): 88.2770, CV MSE: 130.6651 ± 10.6862 (Target: ≤30)
