@@ -1,0 +1,18 @@
+{
+  "features": {
+    "regression_features": [
+      "Hydrogen", "Oxigen", "Nitrogen", "Methane", "CO", "CO2", "Ethylene",
+      "Ethane", "Acetylene", "DBDS", "Power factor", "Interfacial V",
+      "Dielectric rigidity", "Water content",
+      "log_Hydrogen", "log_Methane", "log_Ethylene", "log_Acetylene",
+      "log_CO", "log_CO2", "log_Ethane"
+    ],
+    "fault_features": ["Methane", "Ethylene", "Acetylene"],
+    "duval_percentage_features": ["CH4_pct_Duval", "C2H4_pct_Duval", "C2H2_pct_Duval"]
+  },
+  "model_artifacts": {
+    "health_model_path": "health_index_model.pkl",
+    "life_model_path": "life_expectation_model.pkl",
+    "scaler_path": "scaler_fitted_on_full_data.gz"
+  }
+}

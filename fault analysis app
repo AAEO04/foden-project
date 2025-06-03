@@ -1,0 +1,569 @@
+import sys
+import json
+import os
+import uuid
+from datetime import datetime
+from typing import Dict, List, Optional, Union
+import pandas as pd
+import numpy as np
+import sqlite3
+from PyQt5.QtWidgets import (
+    QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QTabWidget,
+    QPushButton, QLineEdit, QLabel, QGridLayout, QMessageBox, QTableWidget,
+    QTableWidgetItem, QSplashScreen, QFileDialog, QGroupBox
+)
+from PyQt5.QtGui import QPixmap, QIcon, QFont
+from PyQt5.QtCore import Qt
+from sklearn.preprocessing import StandardScaler
+from xgboost import XGBRegressor
+import joblib
+import logging
+from utils import FeatureEngineer, duval_triangle_fault_type, adjust_fault_label
+
+# Setup logging
+logging.basicConfig(
+    filename='app.log',
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    filemode='a'
+)
+
+# Mapping of Duval Triangle fault type acronyms to full names
+FAULT_TYPE_MAPPING = {
+    'PD': 'Partial Discharge',
+    'D1': 'Low Energy Discharge',
+    'D2': 'High Energy Discharge',
+    'T1': 'Thermal Fault (Temperature < 300°C)',
+    'T2': 'Thermal Fault (Temperature 300-700°C)',
+    'T3': 'Thermal Fault (Temperature > 700°C)',
+    'DT': 'Mix of Thermal and Discharge Faults',
+    'NF': 'No Fault',
+    'NF_Undetermined': 'No Fault (Undetermined)'
+}
+
+class TransformerDiagnosticApp(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Transformer Diagnostic Tool")
+        self.setGeometry(100, 100, 1200, 600)
+        self.setWindowIcon(QIcon('icon.png'))
+        self.model_config = self.load_model_config()
+        self.init_models()
+        self.history_db = 'history.db'
+        self.latest_prediction: Optional[Dict] = None
+        self.init_db()
+        self.init_ui()
+        self.apply_styles()
+
+    def load_model_config(self) -> Dict:
+        try:
+            with open('model_config_v3.json', 'r') as f:
+                return json.load(f)
+        except FileNotFoundError:
+            logging.error('model_config_v3.json not found.')
+            QMessageBox.critical(self, "Error", "Model configuration file not found.")
+            sys.exit(1)
+
+    def init_models(self):
+        try:
+            self.scaler: StandardScaler = joblib.load(self.model_config['model_artifacts']['scaler_path'])
+            self.health_model: XGBRegressor = joblib.load(self.model_config['model_artifacts']['health_model_path'])
+            self.life_model: XGBRegressor = joblib.load(self.model_config['model_artifacts']['life_model_path'])
+            logging.info('Models and scaler loaded successfully.')
+        except FileNotFoundError as e:
+            logging.error(f'Model loading failed: {e}')
+            QMessageBox.critical(self, "Error", "Model or scaler file not found.")
+            sys.exit(1)
+
+    def init_db(self):
+        try:
+            with sqlite3.connect(self.history_db) as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                    CREATE TABLE IF NOT EXISTS predictions (
+                        id TEXT PRIMARY KEY,
+                        timestamp TEXT,
+                        type TEXT,
+                        inputs TEXT,
+                        fault_type TEXT,
+                        health_index REAL,
+                        life_expectation REAL
+                    )
+                """)
+                conn.commit()
+            logging.info('Database initialized successfully.')
+        except sqlite3.Error as e:
+            logging.error(f'Database initialization failed: {e}')
+            QMessageBox.critical(self, "Error", "Failed to initialize database.")
+            sys.exit(1)
+
+    def load_history(self) -> List[Dict]:
+        try:
+            with sqlite3.connect(self.history_db) as conn:
+                cursor = conn.cursor()
+                cursor.execute("SELECT * FROM predictions ORDER BY timestamp DESC")
+                rows = cursor.fetchall()
+                history = []
+                for row in rows:
+                    history.append({
+                        'id': row[0],
+                        'timestamp': row[1],
+                        'type': row[2],
+                        'inputs': json.loads(row[3]),
+                        'fault_type': row[4],
+                        'health_index': row[5],
+                        'life_expectation': row[6]
+                    })
+                logging.info(f'Loaded {len(history)} predictions from database.')
+                return history
+        except sqlite3.Error as e:
+            logging.error(f'Failed to load history: {e}')
+            QMessageBox.warning(self, "Warning", "Failed to load prediction history.")
+            return []
+
+    def save_prediction(self, prediction: Dict):
+        try:
+            with sqlite3.connect(self.history_db) as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                    INSERT INTO predictions (id, timestamp, type, inputs, fault_type, health_index, life_expectation)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                """, (
+                    prediction['id'],
+                    prediction['timestamp'],
+                    prediction['type'],
+                    json.dumps(prediction['inputs']),
+                    prediction['fault_type'],
+                    prediction['health_index'],
+                    prediction['life_expectation']
+                ))
+                conn.commit()
+            self.latest_prediction = prediction
+            self.update_export_buttons()
+            logging.info(f'Prediction saved: {prediction["id"]}')
+        except sqlite3.Error as e:
+            logging.error(f'Failed to save prediction: {e}')
+            QMessageBox.warning(self, "Warning", "Failed to save prediction to database.")
+
+    def init_ui(self):
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+        main_layout = QVBoxLayout(central_widget)
+        main_layout.setContentsMargins(20, 20, 20, 20)
+
+        # Create tabs
+        self.tabs = QTabWidget()
+        main_layout.addWidget(self.tabs)
+
+        # Fault Classification Tab
+        self.fault_tab = QWidget()
+        self.tabs.addTab(self.fault_tab, "Fault Classification")
+        self.init_fault_tab()
+
+        # Health and Life Prediction Tab
+        self.prediction_tab = QWidget()
+        self.tabs.addTab(self.prediction_tab, "Health & Life Prediction")
+        self.init_prediction_tab()
+
+        # Prediction History Tab
+        self.history_tab = QWidget()
+        self.tabs.addTab(self.history_tab, "Prediction History")
+        self.init_history_tab()
+
+    def apply_styles(self):
+        # Apply QSS styles for a modern dark theme
+        self.setStyleSheet("""
+            QMainWindow {
+                background-color: #2E2E2E;
+            }
+            QTabWidget::pane {
+                border: 1px solid #4A4A4A;
+                background-color: #3A3A3A;
+            }
+            QTabBar::tab {
+                background: #4A4A4A;
+                color: #D3D3D3;
+                padding: 10px 20px;
+                margin-right: 2px;
+                border-top-left-radius: 4px;
+                border-top-right-radius: 4px;
+            }
+            QTabBar::tab:selected {
+                background: #007ACC;
+                color: #FFFFFF;
+            }
+            QGroupBox {
+                border: 1px solid #4A4A4A;
+                border-radius: 5px;
+                margin-top: 10px;
+                padding: 10px;
+                background-color: #3A3A3A;
+            }
+            QGroupBox::title {
+                subcontrol-origin: margin;
+                subcontrol-position: top left;
+                padding: 0 5px;
+                color: #D3D3D3;
+                font-weight: bold;
+            }
+            QLineEdit {
+                background-color: #4A4A4A;
+                color: #FFFFFF;
+                border: 1px solid #6A6A6A;
+                border-radius: 4px;
+                padding: 5px;
+                font-size: 14px;
+            }
+            QLineEdit:focus {
+                border: 1px solid #007ACC;
+            }
+            QLabel {
+                color: #D3D3D3;
+                font-size: 14px;
+            }
+            QPushButton {
+                background-color: #007ACC;
+                color: #FFFFFF;
+                border: none;
+                border-radius: 4px;
+                padding: 8px 16px;
+                font-size: 14px;
+            }
+            QPushButton:hover {
+                background-color: #005F99;
+            }
+            QPushButton:disabled {
+                background-color: #6A6A6A;
+            }
+            QTableWidget {
+                background-color: #3A3A3A;
+                color: #D3D3D3;
+                border: 1px solid #4A4A4A;
+                gridline-color: #4A4A4A;
+            }
+            QTableWidget::item {
+                padding: 5px;
+            }
+            QHeaderView::section {
+                background-color: #4A4A4A;
+                color: #D3D3D3;
+                padding: 5px;
+                border: 1px solid #3A3A3A;
+            }
+        """)
+
+    def init_fault_tab(self):
+        layout = QVBoxLayout(self.fault_tab)
+        layout.setSpacing(15)
+
+        # Input group
+        input_group = QGroupBox("Input Parameters")
+        grid_layout = QGridLayout()
+        input_group.setLayout(grid_layout)
+
+        # Fault input fields
+        self.fault_inputs = []
+        fault_features = self.model_config['features']['fault_features']
+        for i, feature in enumerate(fault_features):
+            label = QLabel(f"{feature} (ppm):")
+            input_field = QLineEdit()
+            input_field.setPlaceholderText(f"Enter {feature} value")
+            input_field.setToolTip(f"Enter the concentration of {feature} in ppm")
+            grid_layout.addWidget(label, i, 0)
+            grid_layout.addWidget(input_field, i, 1)
+            self.fault_inputs.append(input_field)
+
+        layout.addWidget(input_group)
+
+        # Buttons
+        button_layout = QHBoxLayout()
+        button_layout.setSpacing(10)
+        self.fault_predict_button = QPushButton("Predict Fault")
+        self.fault_predict_button.clicked.connect(self.predict_fault)
+        self.fault_reset_button = QPushButton("Reset")
+        self.fault_reset_button.clicked.connect(self.reset_fault_inputs)
+        self.fault_export_button = QPushButton("Export Latest Result")
+        self.fault_export_button.clicked.connect(self.export_latest_result)
+        self.fault_export_button.setEnabled(False)
+        button_layout.addWidget(self.fault_predict_button)
+        button_layout.addWidget(self.fault_reset_button)
+        button_layout.addWidget(self.fault_export_button)
+        layout.addLayout(button_layout)
+
+        # Result display
+        self.fault_result = QLabel("Fault Type: N/A")
+        self.fault_result.setFont(QFont("Arial", 16, QFont.Bold))
+        self.fault_result.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(self.fault_result)
+        layout.addStretch()
+
+    def init_prediction_tab(self):
+        layout = QVBoxLayout(self.prediction_tab)
+        layout.setSpacing(15)
+
+        # Input group
+        input_group = QGroupBox("Input Parameters")
+        grid_layout = QGridLayout()
+        input_group.setLayout(grid_layout)
+
+        # Regression input fields
+        self.regression_inputs = []
+        regression_features = self.model_config['features']['regression_features']
+        for i, feature in enumerate(regression_features):
+            label = QLabel(f"{feature}:")
+            input_field = QLineEdit()
+            input_field.setPlaceholderText(f"Enter {feature} value")
+            input_field.setToolTip(f"Enter the value for {feature}")
+            grid_layout.addWidget(label, i // 2, (i % 2) * 2)
+            grid_layout.addWidget(input_field, i // 2, (i % 2) * 2 + 1)
+            self.regression_inputs.append(input_field)
+
+        layout.addWidget(input_group)
+
+        # Buttons
+        button_layout = QHBoxLayout()
+        button_layout.setSpacing(10)
+        self.prediction_predict_button = QPushButton("Predict Health & Life")
+        self.prediction_predict_button.clicked.connect(self.predict_health_life)
+        self.prediction_reset_button = QPushButton("Reset")
+        self.prediction_reset_button.clicked.connect(self.reset_prediction_inputs)
+        self.prediction_export_button = QPushButton("Export Latest Result")
+        self.prediction_export_button.clicked.connect(self.export_latest_result)
+        self.prediction_export_button.setEnabled(False)
+        button_layout.addWidget(self.prediction_predict_button)
+        button_layout.addWidget(self.prediction_reset_button)
+        button_layout.addWidget(self.prediction_export_button)
+        layout.addLayout(button_layout)
+
+        # Result display
+        self.health_result = QLabel("Health Index: N/A")
+        self.health_result.setFont(QFont("Arial", 16, QFont.Bold))
+        self.health_result.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.life_result = QLabel("Life Expectation: N/A")
+        self.life_result.setFont(QFont("Arial", 16, QFont.Bold))
+        self.life_result.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.full_fault_result = QLabel("Fault Type: N/A")
+        self.full_fault_result.setFont(QFont("Arial", 16, QFont.Bold))
+        self.full_fault_result.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(self.health_result)
+        layout.addWidget(self.life_result)
+        layout.addWidget(self.full_fault_result)
+        layout.addStretch()
+
+    def init_history_tab(self):
+        layout = QVBoxLayout(self.history_tab)
+        layout.setSpacing(15)
+
+        # History table
+        self.history_table = QTableWidget()
+        self.history_table.setColumnCount(5)
+        self.history_table.setHorizontalHeaderLabels(['Timestamp', 'Type', 'Fault', 'Health Index', 'Life Expectation'])
+        header = self.history_table.horizontalHeader()
+        if header:
+            header.setStretchLastSection(True)
+        self.history_table.setAlternatingRowColors(True)
+        layout.addWidget(self.history_table)
+
+        # Export buttons
+        self.history_export_button = QPushButton("Export Full History to JSON")
+        self.history_export_button.clicked.connect(self.export_full_history)
+        layout.addWidget(self.history_export_button)
+
+        self.update_history_table()
+
+    def update_export_buttons(self):
+        self.fault_export_button.setEnabled(self.latest_prediction is not None)
+        self.prediction_export_button.setEnabled(self.latest_prediction is not None)
+
+    def reset_fault_inputs(self):
+        for input_field in self.fault_inputs:
+            input_field.clear()
+        self.fault_result.setText("Fault Type: N/A")
+
+    def reset_prediction_inputs(self):
+        for input_field in self.regression_inputs:
+            input_field.clear()
+        self.health_result.setText("Health Index: N/A")
+        self.life_result.setText("Life Expectation: N/A")
+        self.full_fault_result.setText("Fault Type: N/A")
+
+    def validate_float(self, value: str, field_name: str) -> Optional[float]:
+        try:
+            return float(value)
+        except ValueError:
+            logging.warning(f"Invalid input for {field_name}: {value}")
+            return None
+
+    def predict_fault(self):
+        inputs = {}
+        for i, feature in enumerate(self.model_config['features']['fault_features']):
+            value = self.fault_inputs[i].text().strip()
+            if not value:
+                QMessageBox.warning(self, "Input Error", f"Please provide a value for {feature}")
+                return
+            float_value = self.validate_float(value, feature)
+            if float_value is None:
+                QMessageBox.warning(self, "Input Error", f"Invalid value for {feature}")
+                return
+            inputs[feature] = float_value
+
+        # Create DataFrame for fault classification
+        df = pd.DataFrame([inputs])
+        df = FeatureEngineer.calculate_gas_percentages_for_duval(df)
+        ch4_pct = df['CH4_pct_Duval'].iloc[0]
+        c2h4_pct = df['C2H4_pct_Duval'].iloc[0]
+        c2h2_pct = df['C2H2_pct_Duval'].iloc[0]
+        fault_type_acronym = duval_triangle_fault_type(ch4_pct, c2h4_pct, c2h2_pct)
+        fault_type_full = FAULT_TYPE_MAPPING.get(fault_type_acronym, "Unknown Fault Type")
+        
+        self.fault_result.setText(f"Fault Type: {fault_type_full}")
+        
+        # Log prediction
+        prediction = {
+            'id': str(uuid.uuid4()),
+            'timestamp': datetime.now().isoformat(),
+            'type': 'fault',
+            'inputs': inputs,
+            'fault_type': fault_type_full,
+            'health_index': None,
+            'life_expectation': None
+        }
+        self.save_prediction(prediction)
+        self.update_history_table()
+
+    def predict_health_life(self):
+        inputs = {}
+        fault_inputs = {}
+        for i, feature in enumerate(self.model_config['features']['regression_features']):
+            value = self.regression_inputs[i].text().strip()
+            if not value:
+                QMessageBox.warning(self, "Input Error", f"Please provide a value for {feature}")
+                return
+            float_value = self.validate_float(value, feature)
+            if float_value is None:
+                QMessageBox.warning(self, "Input Error", f"Invalid value for {feature}")
+                return
+            inputs[feature] = float_value
+            if feature in ['Methane', 'Ethylene', 'Acetylene']:
+                fault_inputs[feature] = float_value
+
+        # Create DataFrame for regression
+        df = pd.DataFrame([inputs])
+        
+        # Feature engineering
+        df = FeatureEngineer.add_gas_ratios(df)
+        df = FeatureEngineer.add_log_features(df)
+        df['CH4_H2_ratio'] = df['Methane'] / (df['Hydrogen'] + 1)
+        df['C2H2_C2H4_ratio'] = df['Acetylene'] / (df['Ethylene'] + 1)
+        df['C2H2_CH4_ratio'] = df['Acetylene'] / (df['Methane'] + 1)
+        df['C2H6_C2H2_ratio'] = df['Ethane'] / (df['Acetylene'] + 1)
+        
+        total_gases = df[['Hydrogen', 'Methane', 'CO', 'CO2', 'Ethylene', 'Ethane', 'Acetylene']].sum(axis=1)
+        df['Total_Gases'] = total_gases
+        df['H2_percent'] = df['Hydrogen'] / total_gases * 100
+        df['CH4_percent'] = df['Methane'] / total_gases * 100
+        df['CO_percent'] = df['CO'] / total_gases * 100
+        df['CO2_percent'] = df['CO2'] / total_gases * 100
+        df['Gas_Concentration'] = total_gases / 1000000
+        df['Gas_DBDS_interaction'] = total_gases * df['DBDS']
+        df['Gas_Water_interaction'] = total_gases * df['Water content']
+        df['Power_Gas_interaction'] = total_gases * df['Power factor']
+        
+        # Prepare features for regression
+        regression_features = self.model_config['features']['regression_features'] + [
+            'CH4_H2_ratio', 'C2H2_C2H4_ratio', 'C2H2_CH4_ratio', 'C2H6_C2H2_ratio',
+            'H2_percent', 'CH4_percent', 'CO_percent', 'CO2_percent',
+            'Gas_Concentration', 'Gas_DBDS_interaction',
+            'Gas_Water_interaction', 'Power_Gas_interaction'
+        ]
+        X = df[regression_features].fillna(0.0)
+        X_scaled = self.scaler.transform(X)
+
+        # Predict
+        health_index = float(np.clip(self.health_model.predict(X_scaled)[0], 0, 100))
+        life_expectation = float(np.clip(self.life_model.predict(X_scaled)[0], 0, 60))
+
+        # Fault classification
+        fault_df = pd.DataFrame([fault_inputs])
+        fault_df = FeatureEngineer.calculate_gas_percentages_for_duval(fault_df)
+        ch4_pct = fault_df['CH4_pct_Duval'].iloc[0]
+        c2h4_pct = fault_df['C2H4_pct_Duval'].iloc[0]
+        c2h2_pct = fault_df['C2H2_pct_Duval'].iloc[0]
+        fault_type_acronym = duval_triangle_fault_type(ch4_pct, c2h4_pct, c2h2_pct)
+        adjusted_fault_acronym = adjust_fault_label(fault_type_acronym, health_index)
+        fault_type_full = FAULT_TYPE_MAPPING.get(adjusted_fault_acronym, "Unknown Fault Type")
+
+        # Display results
+        self.health_result.setText(f"Health Index: {health_index:.2f}%")
+        self.life_result.setText(f"Life Expectation: {life_expectation:.1f} years")
+        self.full_fault_result.setText(f"Fault Type: {fault_type_full}")
+
+        # Log prediction
+        prediction = {
+            'id': str(uuid.uuid4()),
+            'timestamp': datetime.now().isoformat(),
+            'type': 'full_prediction',
+            'inputs': inputs,
+            'fault_type': fault_type_full,
+            'health_index': health_index,
+            'life_expectation': life_expectation
+        }
+        self.save_prediction(prediction)
+        self.update_history_table()
+
+    def update_history_table(self):
+        history = self.load_history()
+        self.history_table.setRowCount(len(history))
+        for row_idx, prediction in enumerate(history):
+            self.history_table.setItem(row_idx, 0, QTableWidgetItem(prediction['timestamp']))
+            self.history_table.setItem(row_idx, 1, QTableWidgetItem(prediction['type']))
+            self.history_table.setItem(row_idx, 2, QTableWidgetItem(prediction['fault_type']))
+            health = f"{prediction['health_index']:.2f}" if prediction['health_index'] is not None else 'N/A'
+            life = f"{prediction['life_expectation']:.1f}" if prediction['life_expectation'] is not None else 'N/A'
+            self.history_table.setItem(row_idx, 3, QTableWidgetItem(health))
+            self.history_table.setItem(row_idx, 4, QTableWidgetItem(life))
+        self.history_table.resizeColumnsToContents()
+
+    def export_latest_result(self):
+        if self.latest_prediction is None:
+            QMessageBox.warning(self, "Warning", "No prediction available to export.")
+            return
+        file_name, _ = QFileDialog.getSaveFileName(self, "Save Latest Result", "", "JSON Files (*.json)")
+        if file_name:
+            try:
+                with open(file_name, 'w') as f:
+                    json.dump(self.latest_prediction, f, indent=2)
+                QMessageBox.information(self, "Success", "Latest result exported successfully.")
+                logging.info(f'Latest result exported to {file_name}')
+            except Exception as e:
+                QMessageBox.warning(self, "Error", "Failed to export latest result.")
+                logging.error(f'Failed to export latest result: {e}')
+
+    def export_full_history(self):
+        history = self.load_history()
+        file_name, _ = QFileDialog.getSaveFileName(self, "Save Full History", "", "JSON Files (*.json)")
+        if file_name:
+            try:
+                with open(file_name, 'w') as f:
+                    json.dump(history, f, indent=2)
+                QMessageBox.information(self, "Success", "Full history exported successfully.")
+                logging.info(f'Full history exported to {file_name}')
+            except Exception as e:
+                QMessageBox.warning(self, "Error", "Failed to export full history.")
+                logging.error(f'Failed to export full history: {e}')
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    
+    # Show splash screen
+    splash_pix = QPixmap('splash.png')
+    splash = QSplashScreen(splash_pix, Qt.WindowType.WindowStaysOnTopHint)
+    splash.show()
+    app.processEvents()
+    
+    # Initialize main window
+    window = TransformerDiagnosticApp()
+    splash.finish(window)
+    window.show()
+    
+    sys.exit(app.exec_())
